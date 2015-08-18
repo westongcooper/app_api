@@ -31,3 +31,10 @@ describe 'app_api /appointments' do
     expect(json?(last_response.body)).to be true
   end
 end
+
+describe 'app_api /appointments/:ID' do
+  it 'GET should return: status 200?' do
+    get '/appointments'
+    last_response.should be_ok
+  end
+end

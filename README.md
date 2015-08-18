@@ -21,3 +21,7 @@ CD into project directory and run the following in the command line:
 
 # to RUN
     $ rerun rackup
+
+
+#### in Pry disable Awesome Print when debugging with #binding.pry via
+    Pry.print = Pry::DEFAULT_PRINT
