@@ -4,10 +4,12 @@ source "https://rubygems.org"
 gem 'sinatra'
 gem 'pg'
 gem 'sequel'
+gem 'json'
+
 
 group :development, :test do
   gem 'pry'
   gem 'rerun'
   gem 'rspec'
-  gem 'capybara'
+  gem 'rack-test'
 end
