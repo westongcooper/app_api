@@ -1,3 +1,3 @@
 # app_api
 
-My Sintra/Rspec/Postgres/Api mash-up
+My Sinatra/Rspec/Postgres/Api mash-up

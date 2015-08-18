@@ -7,7 +7,11 @@ describe 'app_api' do
 
   it 'says Hello' do
     get '/'
-    # last_response.should be_ok
+    last_response.should be_ok
     expect(last_response.body).to include('Hello API')
+  end
+  it 'should return all Appointments' do
+    get '/appointments'
+    last_response.should be_ok
   end
 end
