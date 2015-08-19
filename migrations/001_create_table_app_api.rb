@@ -1,6 +1,6 @@
 Sequel.migration do
   up do
-    create_table(:appt_api) do
+    create_table(:appts) do
       primary_key :id
       timestamp :start_time, null: false
       timestamp :end_time, null: false
@@ -11,6 +11,6 @@ Sequel.migration do
   end
 
   down do
-    drop_table(:appt_api)
+    drop_table(:appts)
   end
 end

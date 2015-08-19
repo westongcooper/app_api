@@ -2,8 +2,14 @@ ENV['RACK_ENV'] = 'test'
 require 'sinatra'
 require 'rspec'
 require 'rack/test'
+require 'sinatra/sequel'
 
-# DB = Sequel.connect('postgres://westoncooper@localhost/app_api_test')
+
+DB_test = Sequel.connect('postgres://westoncooper@localhost/app_api_test')
+class Appt < Sequel::Model
+  set_primary_key [:id]
+end
+
 module RSpecMixin
   include Rack::Test::Methods
   def app
