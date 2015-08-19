@@ -5,16 +5,34 @@ require 'json'
 
 DB = Sequel.connect('postgres://westoncooper@localhost/app_api_development')
 class Appt < Sequel::Model
+  plugin :validation_helpers
+  plugin :validation_class_methods
   set_primary_key [:id]
+  def validate
+    super
+    validates_presence [:first_name, :last_name, :start_time, :end_time]
+    validates_format /^[a-zA-Z]+$/, [:first_name, :last_name]
+    validates_schema_types [:start_time,:end_time]
+  end
+  validates_each :start_time, :end_time do |object, attribute, value|
+    object.errors.add(attribute, "invalid datetime") unless check_date(object, attribute, value)
+  end
 end
 
-def bad_date?(data)
-  if  data['start_time'] < Date.today
-    return false
-  elsif data['end_time'] < data['start_time']
-    return false
+def check_date(object, attribute, value)
+  begin
+    value < Time.now ? (return false) : true
+    object[:start_time] > object[:end_time] ? (return false) : true
+    if attribute == :start_time
+      b = Appt.where{(start_time >= object[:start_time]) & (start_time < object[:end_time])}
+    else
+      b = Appt.where{(end_time < object[:end_time]) & (end_time > object[:start_time])}
+    end
+    b.empty?
+  rescue Exception
+    false
   end
-  true
+    # binding.pry
 end
 
 class AppApi < Sinatra::Application
@@ -24,6 +42,7 @@ class AppApi < Sinatra::Application
 
   get '/appointments' do
     DB[:appts].all.to_json
+    binding.pry
   end
   post '/appointments' do
     strong_params = ['first_name', 'last_name', 'start_time', 'end_time', 'comments']
