@@ -2,7 +2,7 @@ module Time_params
   def self.minutes(min)
     min*60
   end
-  def self.params_good
+  def self.good
     {
     first_name: 'Weston',
     last_name: 'Cooper',
@@ -10,7 +10,7 @@ module Time_params
     end_time: "#{Time.now + minutes(10)}"
     }
   end
-  def self.params_good2
+  def self.good2
     {
     first_name: 'Weston',
     last_name: 'Cooper',
@@ -18,7 +18,7 @@ module Time_params
     end_time: "#{Time.now + minutes(4)}"
     }
   end
-  def self.params_overlap
+  def self.overlap
     {
     first_name: 'Weston',
     last_name: 'Cooper',
@@ -26,7 +26,7 @@ module Time_params
     end_time: "#{Time.now + minutes(7)}"
     }
   end
-  def self.params_old
+  def self.old
     {
     first_name: 'Weston',
     last_name: 'Cooper',

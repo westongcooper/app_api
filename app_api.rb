@@ -45,7 +45,8 @@ class AppApi < Sinatra::Application
   get '/appointments' do
     begin
       pg_code = create_sql
-      DB[:appts].where{pg_code}.all.to_json
+      status 200
+      DB[:appts].where{pg_code}.order(:start_time).all.to_json
     rescue Exception
       status 400
       'invalid date'.to_json
@@ -55,7 +56,7 @@ class AppApi < Sinatra::Application
   get '/appointments/:id' do
     appt = Appt[params[:id]]
     if appt
-      status 200
+      status 302
       appt.values.to_json
     else
       status 404
@@ -68,7 +69,7 @@ class AppApi < Sinatra::Application
     appt = Appt.new(data)
     if appt.valid?
       appt.save
-      status 201
+      status 200
       appt.values.to_json
     else
       status 400
@@ -94,6 +95,8 @@ class AppApi < Sinatra::Application
     appt.nil? ? (return status 404) : appt.delete
     status 202
   end
+
+
 
   def filter_params
     strong_params = ['first_name', 'last_name', 'start_time', 'end_time', 'comments']
