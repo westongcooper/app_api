@@ -17,7 +17,7 @@ CD into project directory and run the following in the command line:
 # Import CSV
 
 
-    $ psql -d postgres -U westoncooper -f scripts/import_csv.sql
+    $ psql -d postgres -U <username> -f scripts/import_csv.sql
 
 # to RUN
     $ rerun rackup
