@@ -1,6 +1,18 @@
 # app_api
 
-When I began this project I thought of it as a challenge to push myself and use as much as
+With the scope of the project I felt the API would be better on Sinatra.  
+I also knew that it would be challenging and I would treat it like a learning experience
+to get a better understanding how Ruby is used on the server.
+
+I used Postgres for the Database and Sequel in Sinatra to access it.
+I used Rspec for integration testing and Pry for debugging.
+I used Rerun to auto restart Sinatra after changes.
+
+I also wanted to practice setting up my own server.  So I'm hosting my API on a
+Digital Ocean server for now @ 104.131.122.161 .  
+I used Unicorn and Nginx and Ubuntu 15.04
+
+You can also set up this respository on your local host if you follow the steps below to set-up the database
 
 
 ####setup postgres with Sequel
@@ -8,21 +20,18 @@ When I began this project I thought of it as a challenge to push myself and use 
 CD into project directory and run the following in the command line:
     $ psql -d postgres -U <username> -f scripts/create_database_app_api.sql
 
-# Then create tables
+#### Then create tables
 
     $ sequel -m migrations postgres://<username>:<password>@localhost/app_api_development
     $ sequel -m migrations postgres://<username>:<password>@localhost/app_api_test
 
-###### EDIT 'import_csv.sql' file and PUT IN the full location of 'appt_data.txt'
 
-# Import CSV
 
+#### Import CSV
+
+EDIT 'import_csv.sql' file and PUT IN the full location of 'appt_data.txt'
 
     $ psql -d postgres -U <username> -f scripts/import_csv.sql
 
-# to RUN
+#### to RUN
     $ rerun rackup
-
-
-#### in Pry disable Awesome Print when debugging with #binding.pry via
-    Pry.print = Pry::DEFAULT_PRINT
