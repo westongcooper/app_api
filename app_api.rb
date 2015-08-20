@@ -42,10 +42,6 @@ end
 
 class AppApi < Sinatra::Application
 
-  get '/' do
-    'Hello API'
-  end
-
   get '/appointments' do
     DB[:appts].all.to_json
   end
