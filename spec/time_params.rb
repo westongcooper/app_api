@@ -18,6 +18,14 @@ module Time_params
     end_time: "#{Time.now + minutes(4)}"
     }
   end
+  def self.good3
+    {
+    first_name: 'Weston',
+    last_name: 'Cooper',
+    start_time: "#{Time.now + minutes(10)}",
+    end_time: "#{Time.now + minutes(15)}"
+    }
+  end
   def self.overlap
     {
     first_name: 'Weston',

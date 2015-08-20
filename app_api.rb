@@ -3,7 +3,19 @@ require 'sinatra/sequel'
 require 'pry'
 require 'json'
 
-DB = Sequel.connect('postgres://westoncooper@localhost/app_api_development')
+
+if ENV['RACK_ENV'] == 'test'
+  DB = Sequel.connect(:adapter=>'postgres',
+                      :host=>'localhost',
+                      :database=>'app_api_test',
+                      :user=>'westoncooper')
+else
+  DB = Sequel.connect(:adapter=>'postgres',
+                      :host=>'localhost',
+                      :database=>'app_api_development',
+                      :user=>'westoncooper',
+                      :password=>ENV['PG_password'])
+end
 
 class Appt < Sequel::Model
   plugin :validation_helpers
