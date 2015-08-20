@@ -3,6 +3,8 @@ require 'sinatra'
 require 'rspec'
 require 'rack/test'
 require 'sinatra/sequel'
+require 'time_params.rb'
+
 
 
 DB_test = Sequel.connect('postgres://westoncooper@localhost/app_api_test')
@@ -19,7 +21,7 @@ end
 
 RSpec.configure do |config|
   config.include RSpecMixin
-
+  config.include Time_params
   config.expect_with :rspec do |c|
     c.syntax = [:should, :expect]
   end
