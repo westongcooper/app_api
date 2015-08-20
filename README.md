@@ -37,3 +37,5 @@ EDIT 'import_csv.sql' file and PUT IN the full location of 'appt_data.txt'
 #### to RUN
 
     $ rerun rackup
+    
+    localhost:9292/appointments
