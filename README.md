@@ -1,6 +1,7 @@
 # app_api
 
-My Sinatra/Rspec/Postgres/Api mash-up
+When I began this project I thought of it as a challenge to push myself and use as much as
+
 
 ####setup postgres with Sequel
 
