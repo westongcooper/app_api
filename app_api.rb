@@ -43,7 +43,13 @@ end
 class AppApi < Sinatra::Application
 
   get '/appointments' do
-    DB[:appts].all.to_json
+    begin
+      pg_code = create_sql
+      DB[:appts].where{pg_code}.all.to_json
+    rescue Exception
+      status 400
+      'invalid date'.to_json
+    end
   end
 
   get '/appointments/:id' do
@@ -53,6 +59,7 @@ class AppApi < Sinatra::Application
       appt.values.to_json
     else
       status 404
+      'no appointment found'.to_json
     end
   end
 
@@ -92,5 +99,20 @@ class AppApi < Sinatra::Application
     strong_params = ['first_name', 'last_name', 'start_time', 'end_time', 'comments']
     params.select { |k, v| strong_params.include? k }
   end
-
+  def create_sql
+    if filter_params['start_time']
+      start_time = "(start_time >= '#{filter_params['start_time']}')"
+    end
+    if filter_params['end_time']
+      end_time = "(end_time <= '#{filter_params['end_time']}')"
+    end
+    if filter_params['start_time'] && filter_params['end_time']
+      pg_code = "#{start_time} AND #{end_time}"
+    elsif filter_params['start_time']
+      pg_code = start_time
+    else
+      pg_code = end_time
+    end
+    pg_code
+  end
 end
