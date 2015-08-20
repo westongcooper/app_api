@@ -18,6 +18,7 @@ You can also set up this respository on your local host if you follow the steps 
 ####setup postgres with Sequel
 
 CD into project directory and run the following in the command line:
+
     $ psql -d postgres -U <username> -f scripts/create_database_app_api.sql
 
 #### Then create tables
@@ -34,4 +35,7 @@ EDIT 'import_csv.sql' file and PUT IN the full location of 'appt_data.txt'
     $ psql -d postgres -U <username> -f scripts/import_csv.sql
 
 #### to RUN
+
     $ rerun rackup
+    
+    localhost:9292/appointments
