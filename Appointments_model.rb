@@ -25,13 +25,17 @@ class Appt < Sequel::Model
   end
   #checks each Start_time and End_time for overlapping conflicts and invalid datetime
   validates_each :start_time, :end_time do |object, attribute, value|
-    object.errors.add(attribute, 'old_date') if old_date(value)
-    object.errors.add(attribute, 'datetime_overlap') if overlap_date(object, attribute, value)
-    object.errors.add(attribute, 'invalid datetime') if invalid_date(object)
+    object.errors.add(attribute, 'datetime overlap') if overlap_date?(object, attribute, value)
   end
+  validates_each :start_time do |object, attribute, value|
+    object.errors.add(attribute, 'old_start_date') if old_start_date?(value)
+    object.errors.add(attribute, 'invalid datetime') if invalid_dates?(object)
+    object.errors.add(attribute, 'datetime overlap') if surround_date?(object)
+  end
+
 end
 
-def invalid_date(object)
+def invalid_dates?(object)
   begin
     (object[:start_time] > object[:end_time] || #checks to see if end time is before start time
       object[:start_time] == object[:end_time]) #checks for valid appointment time
@@ -40,7 +44,7 @@ def invalid_date(object)
   end
 end
 
-def old_date( value)
+def old_start_date?(value)
   begin
     value < Time.now #checks for future date
   rescue Exception
@@ -48,7 +52,7 @@ def old_date( value)
   end
 end
 
-def overlap_date(object, attribute, time)
+def overlap_date?(object, attribute, time)
   begin
     if attribute == :start_time
       pg_code = "(start_time <= '#{time}')"
@@ -61,6 +65,15 @@ def overlap_date(object, attribute, time)
       pg_code2 += " AND (id != #{object[:id]})"
     end
     old_appts = Appt.where{pg_code}.where{pg_code2}
+    old_appts.any?
+  rescue Exception
+    true
+  end
+end
+def surround_date?(object)
+  begin
+    pg_code = "(start_time > '#{object[:start_time]}') AND (start_time < '#{object[:end_time]}')"
+    old_appts = Appt.where{pg_code}
     old_appts.any?
   rescue Exception
     true
