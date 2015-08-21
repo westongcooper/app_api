@@ -22,6 +22,7 @@ end
 RSpec.configure do |config|
   config.include RSpecMixin
   config.include Time_params
+  config.after(:suite) {DB[:appts].delete }
   config.expect_with :rspec do |c|
     c.syntax = [:should, :expect]
   end

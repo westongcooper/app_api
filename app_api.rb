@@ -23,56 +23,61 @@ class Appt < Sequel::Model
   set_primary_key [:id]
   def validate #validate new appointments and updates
     super
-    validates_presence [:first_name, :last_name, :start_time, :end_time]
-    validates_format /^[a-zA-Z]+$/, [:first_name, :last_name]
+    validates_presence [:first_name,
+                        :last_name,
+                        :start_time,
+                        :end_time]
+    validates_format /^[a-zA-Z]+$/, [:first_name,
+                                     :last_name]
     validates_format /^$|^[a-zA-Z0-9 .!?"-]+$/, :comments
-    validates_schema_types [:start_time,:end_time]
+    validates_schema_types [:start_time,
+                            :end_time]
   end
   #checks each Start_time and End_time for overlapping conflicts
   validates_each :start_time, :end_time do |object, attribute, value|
-    object.errors.add(attribute, "invalid datetime") unless check_overlap_date(object, attribute, value)
-  end
-  validates_each :start_time do |object, attribute, value| # Check for inception conflicts.
-    object.errors.add(attribute, "invalid datetime") unless check_inception_date(object,value)
+    object.errors.add(attribute, 'old_date') if old_date(value)
+    object.errors.add(attribute, 'datetime_overlap') if overlap_date(object, attribute, value)
+    object.errors.add(attribute, 'invalid datetime') if invalid_date(object)
   end
 end
 
-def check_overlap_date(object, attribute, value)
+def invalid_date(object)
   begin
-    value < Time.now ? (return false) : true #checks for future date
-    object[:start_time] > object[:end_time] ? (return false) : true #checks to see if end time is before start time
-    object[:start_time] == object[:end_time] ? (return false) : true #checks for valid appointment time
-    if attribute == :start_time #creates SQL command to search for conflicting appointments
-      pg_code = "(start_time >= '#{object[:start_time]}') AND (start_time < '#{object[:end_time]}')"
-    else
-      pg_code = "(end_time <= '#{object[:end_time]}') AND (end_time > '#{object[:start_time]}')"
-    end
-    if object[:id] #adds exception if updating current appointment
-      pg_code += " AND (id != #{object[:id]})"
-    end
-    old_appts = Appt.where{pg_code} #runs postgres scope
-    old_appts.empty? #if empty then validation passes
+    (object[:start_time] > object[:end_time] || #checks to see if end time is before start time
+    object[:start_time] == object[:end_time]) #checks for valid appointment time
   rescue Exception
-    false #if any errors with start and end times then it fails validation
+    true
+  end
+  end
+def old_date( value)
+  begin
+    value < Time.now #checks for future date
+  rescue Exception
+    true
   end
 end
-def check_inception_date(object, start_time)
+def overlap_date(object, attribute, time)
   begin
-    pg_code = "(start_time < '#{start_time}')"
-    pg_code2 = "(end_time > '#{start_time}')"
+    if attribute == :start_time
+      pg_code = "(start_time < '#{time}')"
+      pg_code2 = "(end_time > '#{time}')"
+    else #if testing :end_time
+      pg_code = "(end_time > '#{time}')"
+      pg_code2 = "(start_time < '#{time}')"
+    end
     if object[:id]
-      pg_code += " AND (id != #{object[:id]})"
+      pg_code2 += " AND (id != #{object[:id]})"
     end
     old_appts = Appt.where{pg_code}.where{pg_code2}
-    old_appts.empty?
+    old_appts.any?
   rescue Exception
-    false
+    true
   end
 end
 
 class AppApi < Sinatra::Application
-  #calls method to create postgres scope if any
-  #if pg_code 'nil' then returns all
+  # calls method to create postgres scope if any
+  # if pg_code 'nil' then returns all
   get '/appointments' do
     begin
       pg_code = create_sql
@@ -112,9 +117,9 @@ class AppApi < Sinatra::Application
     end
   end
 
-  #calls method to filter unwanted params
-  #check if appointment exist
-  #if any errors during update then update then it returns errors
+  # calls method to filter unwanted params
+  # check if appointment exist
+  # if any errors during update then update then it returns errors
   put '/appointments/:id' do
     data = filter_params
     appt = Appt[params[:id]]
@@ -133,7 +138,7 @@ class AppApi < Sinatra::Application
     end
   end
 
-  #if appointment does not exist then return errors
+  # if appointment does not exist then return errors
   delete '/appointments/:id'do
     appt = Appt[params[:id]]
     if appt.nil?

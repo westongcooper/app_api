@@ -10,6 +10,7 @@ gem 'json'
 
 group :development, :test do
   gem 'pry'
+  gem 'pry-byebug'
   gem 'rerun'
   gem 'rspec'
   gem 'rack-test'

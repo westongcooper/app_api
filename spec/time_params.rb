@@ -4,7 +4,7 @@ module Time_params
   end
   def self.good
     {
-    first_name: 'Weston',
+    first_name: 'good',
     last_name: 'Cooper',
     start_time: "#{Time.now + minutes(5)}",
     end_time: "#{Time.now + minutes(10)}"
@@ -12,7 +12,7 @@ module Time_params
   end
   def self.good2
     {
-    first_name: 'Weston',
+    first_name: 'goodTwo',
     last_name: 'Cooper',
     start_time: "#{Time.now + minutes(1)}",
     end_time: "#{Time.now + minutes(4)}"
@@ -20,7 +20,7 @@ module Time_params
   end
   def self.good3
     {
-    first_name: 'Weston',
+    first_name: 'goodThree',
     last_name: 'Cooper',
     start_time: "#{Time.now + minutes(10)}",
     end_time: "#{Time.now + minutes(15)}"
@@ -28,7 +28,7 @@ module Time_params
   end
   def self.overlap
     {
-    first_name: 'Weston',
+    first_name: 'overlap',
     last_name: 'Cooper',
     start_time: "#{Time.now + minutes(2)}",
     end_time: "#{Time.now + minutes(7)}"
@@ -36,7 +36,7 @@ module Time_params
   end
   def self.old
     {
-    first_name: 'Weston',
+    first_name: 'old',
     last_name: 'Cooper',
     start_time: "#{Time.now + minutes(-10)}",
     end_time: "#{Time.now + minutes(-5)}"
