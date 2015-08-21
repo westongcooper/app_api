@@ -51,10 +51,10 @@ end
 def overlap_date(object, attribute, time)
   begin
     if attribute == :start_time
-      pg_code = "(start_time < '#{time}')"
+      pg_code = "(start_time <= '#{time}')"
       pg_code2 = "(end_time > '#{time}')"
     else #if testing :end_time
-      pg_code = "(end_time > '#{time}')"
+      pg_code = "(end_time >= '#{time}')"
       pg_code2 = "(start_time < '#{time}')"
     end
     if object[:id]

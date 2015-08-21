@@ -33,6 +33,12 @@ describe 'app_api CRUD' do
       expect(last_response.status).to eq 400
       delete "/appointments/#{post_id}"
     end
+    it 'POST FAILS with Duplicate TIME appointment' do
+      expect(response.status).to eq 200
+      post '/appointments', Time_params.good
+      expect(last_response.status).to eq 400
+      delete "/appointments/#{post_id}"
+    end
     it 'POST FAILS with OLD TIME appointment' do
       post '/appointments', Time_params.old
       expect(last_response.status).to eq 400
