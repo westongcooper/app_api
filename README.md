@@ -21,7 +21,7 @@ CD into project directory and run the following in the command line:
 
     $ psql -d postgres -U <username> -f scripts/create_database_app_api.sql
 
-#### Then create tables
+#### Then create tablesgs
 
     $ sequel -m migrations postgres://<username>:<password>@localhost/app_api_development
     $ sequel -m migrations postgres://<username>:<password>@localhost/app_api_test
