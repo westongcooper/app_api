@@ -5,10 +5,8 @@ require 'rack/test'
 require 'sinatra/sequel'
 require 'time_params.rb'
 require 'factory_girl'
+require 'factories'
 require 'faker'
-
-FactoryGirl.definition_file_paths = %w{./factories ./test/factories ./spec/factories}
-FactoryGirl.find_definitions
 
 DB_test = Sequel.connect('postgres://westoncooper@localhost/app_api_test')
 class Appt < Sequel::Model

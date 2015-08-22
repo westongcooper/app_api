@@ -190,5 +190,9 @@ describe 'app_api model validations' do
                  end_time:new_time(2016,21))).
       not_to be_valid
   end
+end
+
+describe 'Param tests' do
+
 
 end

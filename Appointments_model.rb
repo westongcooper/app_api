@@ -19,7 +19,7 @@ class Appt < Sequel::Model
   def validate #validate new appointments and updates
     super
     validates_presence [:first_name, :last_name, :start_time, :end_time]
-    validates_format /^[a-zA-Z]+$/, [:first_name, :last_name]
+    validates_format /^[a-z ,.'-]+$/i, [:first_name, :last_name]
     validates_format /^$|^[a-zA-Z0-9 .!?"-]+$/, :comments
     validates_schema_types [:start_time, :end_time]
   end

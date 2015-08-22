@@ -1,6 +1,5 @@
 require 'sinatra/base'
 require 'sinatra/sequel'
-require 'pry'
 require 'json'
 require './Appointments_model'
 require './helpers/sql'
