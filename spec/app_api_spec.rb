@@ -2,7 +2,7 @@ require_relative '../app_api.rb'
 require 'rspec'
 require 'rack/test'
 require 'sinatra'
-require 'pry'
+# require 'pry'
 
 describe 'app_api CRUD' do
   describe 'GET /appointments' do
