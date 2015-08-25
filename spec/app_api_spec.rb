@@ -2,6 +2,7 @@ require_relative '../app_api.rb'
 require 'rspec'
 require 'rack/test'
 require 'sinatra'
+require 'pry'
 
 describe 'app_api CRUD' do
   describe 'GET /appointments' do
@@ -193,6 +194,25 @@ describe 'app_api model validations' do
 end
 
 describe 'Param tests' do
-
-
+  it 'returns correct appointments' do
+    appt = build(:appt,
+                 start_time:new_time(2016,1),
+                 end_time:new_time(2016,2))
+    appt.save
+    appt = build(:appt,
+                 start_time:new_time(2016,2),
+                 end_time:new_time(2016,3))
+    appt.save
+    appt = build(:appt,
+                 start_time:new_time(2016,3),
+                 end_time:new_time(2016,4))
+    appt.save
+    start_time = new_time(2016,1)
+    end_time = new_time(2016,2)
+    scope = get '/appointments', {start_time: start_time, end_time: end_time }
+    expect(scope.body).to eq  DB[:appts].
+                                where("(start_time >= '#{start_time}')").
+                                where("(end_time <= '#{end_time}')").
+                                all.to_json
+  end
 end
