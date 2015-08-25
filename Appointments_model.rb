@@ -1,15 +1,24 @@
 #switch database access for testing environment
+# if ENV['RACK_ENV'] == 'test'
+#   DB = Sequel.connect(:adapter=>'postgres',
+#                       :host=>'localhost',
+#                       :database=>'app_api_test',
+#                       :user=>'westoncooper')
+# else
+#   DB = Sequel.connect(:adapter=>'postgres',
+#                       :host=>'localhost',
+#                       :database=>'app_api_development',
+#                       :user=>'westoncooper',
+#                       :password=>ENV['PG_password'])
+# end
 if ENV['RACK_ENV'] == 'test'
-  DB = Sequel.connect(:adapter=>'postgres',
-                      :host=>'localhost',
-                      :database=>'app_api_test',
-                      :user=>'westoncooper')
-else
   DB = Sequel.connect(:adapter=>'postgres',
                       :host=>'localhost',
                       :database=>'app_api_development',
                       :user=>'westoncooper',
                       :password=>ENV['PG_password'])
+else
+  DB = Sequel.connect("postgres://root:CmyqwDiK4WUMNxcJ@172.17.42.1:32768/db")
 end
 
 class Appt < Sequel::Model
