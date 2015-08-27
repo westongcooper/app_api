@@ -1,7 +1,6 @@
 require 'sinatra/base'
 require 'sinatra/sequel'
 require 'json'
-require 'pry'
 
 if ENV['RACK_ENV'] == 'test'
   DB = Sequel.connect(:adapter=>'postgres',
@@ -9,17 +8,12 @@ if ENV['RACK_ENV'] == 'test'
                       :database=>'app_api_test',
                       :user=>'westoncooper')
 else
-  DB = Sequel.connect(:adapter=>'postgres',
-                      :host=>'localhost',
-                      :database=>'app_api_development',
-                      :user=>'westoncooper')
-  # DB = Sequel.connect(adapter: 'postgresql',
-  #                     host: '172.17.42.1',
-  #                     database: 'app_api_development',
-  #                     user: 'root',
-  #                     port:'32771',
-  #                     password: ENV['PG_password'])
-  # DB = Sequel.connect("postgres://root:CmyqwDiK4WUMNxcJ@172.17.42.1:32768/db")
+  DB = Sequel.connect(adapter: 'postgresql',
+                      host: '172.17.42.1',
+                      database: 'app_api_development',
+                      user: 'root',
+                      port:'32771',
+                      password: ENV['PG_password'])
 end
 
 class Appt < Sequel::Model
@@ -137,12 +131,12 @@ end
 
 def find_appointments
   if filter_params['start_time'] && filter_params['end_time']
-    appts = DB[:appts].where{|o| o.start_time >= filter_params['start_time'].to_s}
-    appts.where{|o| o.end_time <= filter_params['end_time'].to_s}
+    appts = DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}
+    appts.where{|a| a.end_time <= filter_params['end_time'].to_s}
   elsif filter_params['start_time']
-    DB[:appts].where{|o| o.start_time >= filter_params['start_time'].to_s}
+    DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}
   else
-    DB[:appts].where{|o| o.end_time <= filter_params['end_time'].to_s}
+    DB[:appts].where{|a| a.end_time <= filter_params['end_time'].to_s}
   end
 end
 
@@ -166,27 +160,28 @@ end
 def overlap_date?(object, attribute, time)
   begin
     if attribute == :start_time
-      pg_code = "(start_time <= '#{time}')"
-      pg_code2 = "(end_time > '#{time}')"
-    else #if testing :end_time
-      pg_code = "(end_time >= '#{time}')"
-      pg_code2 = "(start_time < '#{time}')"
+      appts = Appt.where{|a| a.start_time <= time.to_s}
+      appts = appts.where{|a| a.end_time > time.to_s}
+    else
+      appts = Appt.where{|a| a.end_time >= time.to_s}
+      appts = appts.where{|a| a.start_time < time.to_s}
     end
     if object[:id]
-      pg_code2 += " AND (id != #{object[:id]})"
+      appts = appts.where{|a| a.id == object[:id].to_i}
     end
-    old_appts = Appt.where{pg_code}.where{pg_code2}
-    old_appts.any?
+    appts.any?
   rescue Exception
     true
   end
 end
 
+
 def surround_date?(object)
   begin
-    pg_code = "(start_time > '#{object[:start_time]}') AND (start_time < '#{object[:end_time]}')"
-    old_appts = Appt.where{pg_code}
-    old_appts.any?
+    # binding.pry
+    appts = DB[:appts].where{|a| a.start_time > object[:start_time].to_s}
+    appts = appts.where{|a| a.start_time < object[:end_time].to_s}
+    appts.any?
   rescue Exception
     true
   end
