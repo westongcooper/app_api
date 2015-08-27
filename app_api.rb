@@ -117,7 +117,6 @@ class AppApi < Sinatra::Application
       status 202
     end
   end
-
 end
 
 def filter_params
@@ -126,7 +125,7 @@ def filter_params
 end
 
 def time_params?
-  filter_params['start_time'] || filter_params['end_time'] ? true : false
+  filter_params['start_time'] || filter_params['end_time']
 end
 
 def find_appointments
@@ -174,7 +173,6 @@ def overlap_date?(object, attribute, time)
     true
   end
 end
-
 
 def surround_date?(object)
   begin
