@@ -178,7 +178,6 @@ end
 
 def surround_date?(object)
   begin
-    # binding.pry
     appts = DB[:appts].where{|a| a.start_time > object[:start_time].to_s}
     appts = appts.where{|a| a.start_time < object[:end_time].to_s}
     appts.any?
