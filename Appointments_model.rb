@@ -5,11 +5,12 @@ if ENV['RACK_ENV'] == 'test'
                       :database=>'app_api_test',
                       :user=>'westoncooper')
 else
-  DB = Sequel.connect(:adapter=>'postgres',
-                      :host=>'172.17.42.1',
-                      :database=>'db',
-                      :user=>'root',
-                      :password=>ENV['PG_password'])
+  DB = Sequel.connect(adapter: 'postgresql',
+                      host: '172.17.42.1',
+                      database: 'app_api_development',
+                      user: 'root',
+                      port:'32771',
+                      password: ENV['PG_password'])
   # DB = Sequel.connect("postgres://root:CmyqwDiK4WUMNxcJ@172.17.42.1:32768/db")
 end
 
