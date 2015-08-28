@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'sinatra/sequel'
 require 'json'
+require 'sinatra/contrib'
 
 if ENV['RACK_ENV'] == 'test'
   DB = Sequel.connect(:adapter=>'postgres',
@@ -20,14 +21,13 @@ class Appt < Sequel::Model
   plugin :validation_helpers
   plugin :validation_class_methods
   set_primary_key [:id]
-  def validate #validate new appointments and updates
+  def validate
     super
     validates_presence [:first_name, :last_name, :start_time, :end_time]
     validates_format /^[a-z ,.'-]+$/i, [:first_name, :last_name]
     validates_format /^$|^[a-zA-Z0-9 .!?"-]+$/, :comments
     validates_schema_types [:start_time, :end_time]
   end
-  #checks each Start_time and End_time for overlapping conflicts and invalid datetime
   validates_each :start_time, :end_time do |object, attribute, value|
     object.errors.add(attribute, 'datetime overlap') if overlap_date?(object, attribute, value)
   end
@@ -39,11 +39,17 @@ class Appt < Sequel::Model
 
 end
 
+
 class AppApi < Sinatra::Application
-  # calls method to create postgres scope if any
-  # if pg_code 'nil' then returns all
+  register Sinatra::Contrib
+  before /.*/ do
+    if request.url.match(/.json$/)
+      request.accept.unshift('application/json')
+      request.path_info = request.path_info.gsub(/.json$/,'')
+    end
+  end
+
   get '/appointments' do
-    # binding.pry
     begin
       if time_params?
         appts = find_appointments
@@ -58,21 +64,17 @@ class AppApi < Sinatra::Application
     end
   end
 
-  #if appt is found them return json
   get '/appointments/:id' do
     appt = Appt[params[:id].to_i]
     if appt
       status 302
-      appt.values.to_json
+        appt.values.to_json
     else
       status 404
       'no appointment found'.to_json
     end
   end
 
-  #calls method to filter unwanted params
-  #runs validation Sequel method
-  #returns errors if any
   post '/appointments' do
     data = filter_params
     appt = Appt.new(data)
@@ -86,9 +88,6 @@ class AppApi < Sinatra::Application
     end
   end
 
-  # calls method to filter unwanted params
-  # check if appointment exist
-  # if any errors during update then update then it returns errors
   put '/appointments/:id' do
     data = filter_params
     appt = Appt[params[:id].to_i]
@@ -107,7 +106,6 @@ class AppApi < Sinatra::Application
     end
   end
 
-  # if appointment does not exist then return errors
   delete '/appointments/:id'do
     appt = Appt[params[:id].to_i]
     if appt.nil?
@@ -141,8 +139,8 @@ end
 
 def invalid_dates?(object)
   begin
-    (object[:start_time] > object[:end_time] || #checks to see if end time is before start time
-      object[:start_time] == object[:end_time]) #checks for valid appointment time
+    (object[:start_time] > object[:end_time] ||
+      object[:start_time] == object[:end_time])
   rescue Exception
     true
   end
@@ -150,7 +148,7 @@ end
 
 def old_start_date?(value)
   begin
-    value < Time.now #checks for future date
+    value < Time.now
   rescue Exception
     true
   end

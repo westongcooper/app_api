@@ -6,6 +6,7 @@ gem 'pg'
 gem 'sequel'
 gem 'sinatra-sequel'
 gem 'json'
+gem 'sinatra-contrib'
 group :development, :test do
   gem 'pry'
   gem 'pry-byebug'
