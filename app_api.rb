@@ -32,11 +32,9 @@ class Appt < Sequel::Model
     object.errors.add(attribute, 'datetime overlap') if overlap_date?(object, attribute, value)
   end
   validates_each :start_time do |object, attribute, value|
-    object.errors.add(attribute, 'old_start_date') if old_start_date?(value)
-    object.errors.add(attribute, 'invalid datetime') if invalid_dates?(object)
+    object.errors.add(attribute, 'invalid datetime') if invalid_dates?(object, value)
     object.errors.add(attribute, 'datetime overlap') if surround_date?(object)
   end
-
 end
 
 
@@ -128,8 +126,8 @@ end
 
 def find_appointments
   if filter_params['start_time'] && filter_params['end_time']
-    appts = DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}
-    appts.where{|a| a.end_time <= filter_params['end_time'].to_s}
+    DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}.
+               where{|a| a.end_time <= filter_params['end_time'].to_s}
   elsif filter_params['start_time']
     DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}
   else
@@ -137,18 +135,10 @@ def find_appointments
   end
 end
 
-def invalid_dates?(object)
+def invalid_dates?(object, value)
   begin
-    (object[:start_time] > object[:end_time] ||
-      object[:start_time] == object[:end_time])
-  rescue Exception
-    true
-  end
-end
-
-def old_start_date?(value)
-  begin
-    value < Time.now
+    (object[:start_time] >= object[:end_time] ||
+      value < Time.now)
   rescue Exception
     true
   end
@@ -157,11 +147,11 @@ end
 def overlap_date?(object, attribute, time)
   begin
     if attribute == :start_time
-      appts = Appt.where{|a| a.start_time <= time.to_s}
-      appts = appts.where{|a| a.end_time > time.to_s}
+      appts = Appt.where{|a| a.start_time <= time.to_s}.
+                   where{|a| a.end_time > time.to_s}
     else
-      appts = Appt.where{|a| a.end_time >= time.to_s}
-      appts = appts.where{|a| a.start_time < time.to_s}
+      appts = Appt.where{|a| a.end_time >= time.to_s}.
+                   where{|a| a.start_time < time.to_s}
     end
     if object[:id]
       appts = appts.where{|a| a.id == object[:id].to_i}
@@ -174,8 +164,8 @@ end
 
 def surround_date?(object)
   begin
-    appts = DB[:appts].where{|a| a.start_time > object[:start_time].to_s}
-    appts = appts.where{|a| a.start_time < object[:end_time].to_s}
+    appts = DB[:appts].where{|a| a.start_time > object[:start_time].to_s}.
+                       where{|a| a.start_time < object[:end_time].to_s}
     appts.any?
   rescue Exception
     true
