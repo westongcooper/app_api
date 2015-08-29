@@ -9,8 +9,7 @@ I used Rspec for integration testing and Pry for debugging.
 I used Rerun to auto restart Sinatra after changes.
 
 I also wanted to practice setting up my own server.  So I'm hosting my API on a
-Digital Ocean server. The API is running on Dokku and it can be reached at api.westoncooper.com/appointments.json  
-I used Unicorn and Nginx and Ubuntu 15.04
+Digital Ocean server. The API is running on Dokku and it can be reached at api.westoncooper.com/appointments.json
 
 You can also set up this respository on your local host if you follow the steps below to set-up the database
 
