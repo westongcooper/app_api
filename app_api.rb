@@ -133,7 +133,7 @@ def find_appointments
   else
     DB[:appts].where{|a| a.end_time <= filter_params['end_time'].to_s}
   end
-end
+end  # RETURN an array of all the appointments.(what you can do is return JUST THEIR room numbers's it and then remove duplicates so then you have an array of all the room numbers that are currently booked for that day. then compare that to ALL the rooms.)
 
 def invalid_dates?(object, value)
   begin
