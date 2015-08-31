@@ -3,7 +3,7 @@ require 'sinatra/sequel'
 require 'json'
 require 'sinatra/contrib'
 
-if ENV['RACK_ENV'] == 'test' #Connect to the database
+if ENV['RACK_ENV'] == 'test'
   DB = Sequel.connect(:adapter=>'postgres',
                       :host=>'localhost',
                       :database=>'app_api_test',
@@ -17,7 +17,7 @@ else
                       password: ENV['PG_password'])
 end
 
-class Appt < Sequel::Model #Sequel Model for appointments.
+class Appt < Sequel::Model
   plugin :validation_helpers
   plugin :validation_class_methods
   set_primary_key [:id]
@@ -28,19 +28,19 @@ class Appt < Sequel::Model #Sequel Model for appointments.
     validates_format /^$|^[a-zA-Z0-9 .!?"-]+$/, :comments
     validates_schema_types [:start_time, :end_time]
   end
-  validates_each :start_time, :end_time do |object, attribute, value| #sends The NEW 'appointment', the 'start_time' or 'end_time', and the 'time'
-    object.errors.add(attribute, 'datetime overlap') if overlap_date?(object, attribute, value) #if overlap_date? true then return errors.
+  validates_each :start_time, :end_time do |object, attribute, value|
+    object.errors.add(attribute, 'datetime overlap') if overlap_date?(object, attribute, value)
   end
   validates_each :start_time do |object, attribute, value|
-    object.errors.add(attribute, 'invalid datetime') if invalid_dates?(object, value) #checks if NEW appointment start_time is > new end_time AND start_time != end_time
-    object.errors.add(attribute, 'datetime overlap') if surround_date?(object)# checks current appointments and sees if NEW start_time is > each appointment start_time & < the same appt's end_time.
+    object.errors.add(attribute, 'invalid datetime') if invalid_dates?(object, value) 
+    object.errors.add(attribute, 'datetime overlap') if surround_date?(object)
   end
 end
 
 
 class AppApi < Sinatra::Application
   register Sinatra::Contrib
-  before /.*/ do #added to respond to .json extension
+  before /.*/ do 
     if request.url.match(/.json$/)
       request.accept.unshift('application/json')
       request.path_info = request.path_info.gsub(/.json$/,'')
@@ -49,10 +49,10 @@ class AppApi < Sinatra::Application
 
   get '/appointments' do
     begin
-      if time_params? #if time params are passed in get command
-        appts = find_appointments #find appointments in that time.
+      if time_params? 
+        appts = find_appointments 
       else
-        appts = DB[:appts].order(:start_time) #or return ALL appointments
+        appts = DB[:appts].order(:start_time)
       end
       status 200
       appts.all.to_json
@@ -126,14 +126,14 @@ end
 
 def find_appointments
   if filter_params['start_time'] && filter_params['end_time']
-    DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}. #Scan the the Table. For each appointment compare to NEW start time.
-               where{|a| a.end_time <= filter_params['end_time'].to_s} #if new start_time is greater AND its end_time is less than or equal
+    DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}.
+               where{|a| a.end_time <= filter_params['end_time'].to_s}
   elsif filter_params['start_time']
     DB[:appts].where{|a| a.start_time >= filter_params['start_time'].to_s}
   else
     DB[:appts].where{|a| a.end_time <= filter_params['end_time'].to_s}
   end
-end  # return an array of all the appointments.
+end
 
 def invalid_dates?(object, value)
   begin
