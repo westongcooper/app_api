@@ -49,11 +49,7 @@ class AppApi < Sinatra::Application
 
   get '/appointments' do
     begin
-      if time_params? #if time params are passed in get command
-        appts = find_appointments #find appointments in that time.
-      else
-        appts = DB[:appts].order(:start_time) #or return ALL appointments
-      end
+      appts = time_params? ? find_appointments : DB[:appts].order(:start_time)
       status 200
       appts.all.to_json
     rescue Exception
@@ -66,7 +62,7 @@ class AppApi < Sinatra::Application
     appt = Appt[params[:id].to_i]
     if appt
       status 302
-        appt.values.to_json
+      appt.values.to_json
     else
       status 404
       'no appointment found'.to_json
